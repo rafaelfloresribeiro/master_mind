@@ -1,6 +1,5 @@
-# literal_frozen_string = true
+# frozen_string_literal = true
 require 'pry-byebug'
- 
 def color_squares(color)
   case color
   when 1
@@ -19,19 +18,11 @@ def code_generator
 end
 
 def code_guessing(opponent_code, player_guess)
-  code_breaking = []
-  opponent_code.each do |code_color|
-    player_guess.each.with_index do |play_color, index|
-      if code_color[index] == play_color[index]
-        code_breaking << 2
-      elsif code_color[index] == play_color
-        code_breaking << 1
-    end
+  code_guess = opponent_code.map.with_index do |_, code_index|
+    opponent_code[code_index] == player_guess[code_index] ? 2 : nil
   end
+  
 end
 
-a = code_generator
-print a
-a.each do |element|
-print color_squares(element)
-end
+print code_guessing([1, 1, 1, 1], [1, 1, 2, 2])
+
