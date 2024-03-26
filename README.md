@@ -15,3 +15,8 @@ Com o array  que me da os acertos exatos, gravo o tamanho da array. Com o tamanh
 outro map with index para perguntar se any? numero esta presente. Caso esteja mando uma informacao correspondente pra casa do array, caso nao esteja, pula. Ao final teremos um codigo com a representacao (2) para acertos completos e (1) parciais.
 
 Como o jogo so acaba com todos os acertos, a verificacao se o jogo acabou deve ser uma simples comparacao se todos os numeros batem. Tentando criar uma funcao ou classe para distinguir.
+
+Agora, cria-se outra funcao que apresenta o jogo, demonstra os quadrados que serao usados e as cores, alem de mostrar como os acertos e erros serao mostrados
+a primeira parte e fazer o jogador jogar contra o computador, portanto, comeca-se com o computador gerando um codigo, depois pede-se pro usuario uma sequencia de numero. O jogo
+possui por padrao 12 rounds, entao faca um loop no qual pede a sequencia de numero para o jogador, depois apresenta os acertos e  erros. O jogo acaba quando ou se acerta tudo, ou
+quando o limite de rounds termina
