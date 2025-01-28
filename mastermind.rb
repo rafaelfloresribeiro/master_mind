@@ -3,8 +3,8 @@
 # a explicacao aparece na tela, agora falta todo o resto
 # o programa precisa: 1) gerar um codigo de 4 numeros usando uma das 6 cores                             (X)
 #                    2) fornecer uma forma do jogador jogar                                              (X)
-#                    3) verificar quais dos numeros jogados equivalem aos numeros gerados                ( )
-#                    4) mostrar o resultado ao jogador                                                   ( )
+#                    3) verificar quais dos numeros jogados equivalem aos numeros gerados                (X)
+#                    4) mostrar o resultado ao jogador                                                   (X)
 #                    5) repetir os passos 2-4 ate o 12 round ou o jogador acertar o codigo               ( )
 
 require 'pry-byebug'
@@ -22,7 +22,6 @@ def color_squares(color)
     "\e[45m  5  \e[0m"
   when 6
     "\e[46m  6  \e[0m"
-    
   end
 end
 
@@ -51,9 +50,8 @@ def play_round
     until guess
       print "Guess the colors\n"
       guess = gets.chomp
-      #binding.pry
       if valid_input?(guess) == true
-        print ("Round played successfully")
+        print ('Round played successfully')
         print(round, "\n")
       else
         print("Your answer should only contain numbers and only have 4 digits\n")
@@ -62,7 +60,7 @@ def play_round
       end
     end
   end
-  print ("Next round\n")
+  print "Next round\n"
 end
 
 def valid_input?(input)
@@ -77,16 +75,26 @@ end
 def calculate_score(code, guess)
   white_pins = code.digits.reverse
   black_pins = guess.digits.reverse
-  w_result = white_pins.map.with_index { |c_code, index| c_code == black_pins[index] ? 1 : 0 }
-  print w_result
+  w_result = white_pins.map.with_index { |a_code, index| a_code == black_pins[index] ? 1 : nil }
+  b_result = black_pins.map { |b_code| white_pins.include?(b_code) ? 2 : nil }
+  # binding.pry
+  [w_result.compact.length, b_result.compact.length - w_result.compact.length]
+
+  # [w_result, b_result]
 end
 
-# pegar uma sequencia de 4 numeros. verificar primeiramente quais desses numeros aparecem, para disponibilizar os pinos
-# pretos que indicam quais numeros pertencem mas nao necessariamente estao na posicao correta. depois verificar quais estao
-# tanto nas posicoes corretas e sao os numeros corretos. sinta a liberdade de fazer na ordem contraria, o que achar melhor
+def show_score(score)
+  score[0].times { print "\e[37m ⬤" }
+  score[1].times { print "\e[30m ⬤" }
+end
+
+# tenho dois resultados que dao em uma array, 1 para cada pino branco, 2 para cada pino preto. para calcular quantos
+# pinos o usuario acertou, basta lembrar que os pretos tambem contam os brancos, e subtrair a quantia de pretos existentes
+# pela quantidade de pinos brancos.
 
 # game_intro
 # game_start
-calculate_score(1111, 1214)
+# print(calculate_score(1214, 1413))
+show_score([1, 2])
 
 
