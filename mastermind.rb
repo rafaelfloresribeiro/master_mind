@@ -94,7 +94,7 @@ end
 
 # game_intro
 # game_start
-# print(calculate_score(1214, 1413))
+# print(calculate_score(1214, 1413)) 
 show_score([1, 2])
 
 
