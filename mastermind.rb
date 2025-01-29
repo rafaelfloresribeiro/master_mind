@@ -5,7 +5,8 @@
 #                    2) fornecer uma forma do jogador jogar                                              (X)
 #                    3) verificar quais dos numeros jogados equivalem aos numeros gerados                (X)
 #                    4) mostrar o resultado ao jogador                                                   (X)
-#                    5) repetir os passos 2-4 ate o 12 round ou o jogador acertar o codigo               ( )
+#                    5) repetir os passos 2-4 ate o 12 round ou o jogador acertar o codigo               (X)
+#                    6) polir o resultado, oferecer uma UI
 
 require 'pry-byebug'
 def color_squares(color)
@@ -29,11 +30,11 @@ def computer_code_generator
   Array.new(4) { rand(1..6) }
 end
 
-SEQUENCE = [1, 2, 3, 4, 5, 6]
+SEQUENCE = [1..6]
 
 def game_start
-  computer_code = code_generator
   print 'type the color sequence'
+  computer_code = code_generator
 end
 
 def game_intro
@@ -45,22 +46,18 @@ def game_intro
 end
 
 def play_round
-  for round in 1..12
-    guess = false
-    until guess
-      print "Guess the colors\n"
-      guess = gets.chomp
-      if valid_input?(guess) == true
-        print ('Round played successfully')
-        print(round, "\n")
-      else
-        print("Your answer should only contain numbers and only have 4 digits\n")
-        print(round)
-        guess = false
-      end
+  guess = false
+  until guess
+    print "Guess the colors\n"
+    guess = gets.chomp
+    if valid_input?(guess) == true
+      print("Round played successfully\n")
+    else
+      print("Your answer should only contain numbers and only have 4 digits\n")
     end
   end
   print "Next round\n"
+  guess
 end
 
 def valid_input?(input)
@@ -73,28 +70,41 @@ rescue ArgumentError
 end
 
 def calculate_score(code, guess)
-  white_pins = code.digits.reverse
-  black_pins = guess.digits.reverse
+  white_pins = code
+  black_pins = guess
   w_result = white_pins.map.with_index { |a_code, index| a_code == black_pins[index] ? 1 : nil }
   b_result = black_pins.map { |b_code| white_pins.include?(b_code) ? 2 : nil }
-  # binding.pry
-  [w_result.compact.length, b_result.compact.length - w_result.compact.length]
-
-  # [w_result, b_result]
+  if w_result.compact.length == 4
+    'End game'
+  else
+    [w_result.compact.length, b_result.compact.length - w_result.compact.length]
+  end
 end
 
 def show_score(score)
-  score[0].times { print "\e[37m ⬤" }
-  score[1].times { print "\e[30m ⬤" }
+  if score.instance_of?(Array)
+    score[0].times { print "\e[37m ⬤\e[0m" }
+    score[1].times { print "\e[30m ⬤\e[0m" }
+  else
+    'Game end'
+  end
 end
 
-# tenho dois resultados que dao em uma array, 1 para cada pino branco, 2 para cada pino preto. para calcular quantos
-# pinos o usuario acertou, basta lembrar que os pretos tambem contam os brancos, e subtrair a quantia de pretos existentes
-# pela quantidade de pinos brancos.
+def play_game(rounds = 0)
+  game_intro
+  print computer_code = computer_code_generator
+  while rounds <= 12
+    rounds += 1
+    player_guess = play_round.to_i.digits.reverse
+    score = calculate_score(computer_code, player_guess)
+    if score.instance_of?(String)
+      print(show_score([4, 0]))
+      rounds = 12
+      break
+    else
+      print(show_score(score))
+    end
+  end
+end
 
-# game_intro
-# game_start
-# print(calculate_score(1214, 1413)) 
-show_score([1, 2])
-
-
+play_game
