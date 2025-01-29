@@ -6,7 +6,7 @@
 #                    3) verificar quais dos numeros jogados equivalem aos numeros gerados                (X)
 #                    4) mostrar o resultado ao jogador                                                   (X)
 #                    5) repetir os passos 2-4 ate o 12 round ou o jogador acertar o codigo               (X)
-#                    6) polir o resultado, oferecer uma UI
+#                    6) polir o resultado, oferecer uma UI 
 
 require 'pry-byebug'
 def color_squares(color)
