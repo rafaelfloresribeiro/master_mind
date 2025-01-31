@@ -27,7 +27,7 @@ def color_squares(color)
 end
 
 def computer_code_generator
-  Array.new(4) { rand(1..6) }
+  [5, 1, 4, 2]
 end
 
 SEQUENCE = [1, 2, 3, 4, 5, 6]
@@ -74,7 +74,7 @@ def calculate_score(code, guess)
   white_pins = code
   black_pins = guess
   w_result = white_pins.map.with_index { |a_code, index| a_code == black_pins[index] ? 1 : nil }
-  b_result = black_pins.map { |b_code| white_pins.include?(b_code) ? 2 : nil }
+  b_result = black_pins.map.with_index { |b_code, index| white_pins[index] == b_code ? 2 : nil }
   if w_result.compact.length == 4
     'End game'
   else
