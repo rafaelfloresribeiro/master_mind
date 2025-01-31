@@ -27,7 +27,7 @@ def color_squares(color)
 end
 
 def computer_code_generator
-  [5, 1, 4, 2]
+  Array.new(4) { rand(1..6) }
 end
 
 SEQUENCE = [1, 2, 3, 4, 5, 6]
