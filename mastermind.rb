@@ -27,7 +27,8 @@ def color_squares(color)
 end
 
 def computer_code_generator
-  Array.new(4) { rand(1..6) }
+  #Array.new(4) { rand(1..6) }
+  [1, 2, 1, 4]
 end
 
 SEQUENCE = [1, 2, 3, 4, 5, 6]
@@ -39,7 +40,6 @@ end
 
 def game_intro
   print "Welcome to Mastermind \n the computer will use one of 6 colors to represent it's code\n "
-  #binding.pry
   display_code(SEQUENCE)
   print "\nfor each correct guess in the correct position, you get a \e[37m ⬤\e[0m\n"
   print "for each correct guess in the incorrect position, you get a \e[30m ⬤\e[0m\n"
@@ -74,18 +74,28 @@ def calculate_score(code, guess)
   white_pins = code
   black_pins = guess
   w_result = white_pins.map.with_index { |a_code, index| a_code == black_pins[index] ? 1 : nil }
-  b_result = black_pins.map.with_index { |b_code, index| white_pins[index] == b_code ? 2 : nil }
+  b_result = black_pins.map.with_index do |b_code, index|
+    if black_pins[index] == white_pins[index]
+      nil
+    elsif white_pins.include?(b_code) && black_pins[0..2].include?(b_code) == false
+      2
+    end
+  end
+  #binding.pry
   if w_result.compact.length == 4
     'End game'
   else
-    [w_result.compact.length, b_result.compact.length - w_result.compact.length]
+    [w_result.compact.length, b_result.compact.length]
   end
+  #binding.pry
 end
+# iterar por uma lista, desconsiderando o ultimo numero
 
 def show_score(score)
   if score.instance_of?(Array)
     score[0].times { print "\e[37m ⬤\e[0m  " }
     score[1].times { print "\e[30m ⬤\e[0m  " }
+    return # return very much needed, else the times method prints a phantom 0
   else
     'Game end'
   end
@@ -103,13 +113,10 @@ def play_game(rounds = 0)
       rounds = 12
       break
     else
-      print("xdddddd #{show_score(score)}\n")
+      print(show_score(score))
     end
   end
 end
-
-#play_game
-print(color_squares(computer_code_generator))
 
 def display_code(code)
   code.each { |pin| print color_squares(pin) }
