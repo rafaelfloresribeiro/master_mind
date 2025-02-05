@@ -52,7 +52,7 @@ def play_round(round_number)
     print "Guess the colors\n"
     guess = gets.chomp
     if valid_input?(guess) == true
-      print("Round #{round_number} played successfully\n")
+      print("Round #{round_number + 1} played successfully\n")
     else
       print("Your answer should only contain numbers and only have 4 digits\n")
     end
@@ -101,16 +101,16 @@ def show_score(score)
   end
 end
 
-def play_game(rounds = 0)
+def play_game(rounds = 12)
   game_intro
   print computer_code = computer_code_generator
-  while rounds <= 12
-    rounds += 1
-    player_guess = play_round(rounds).to_i.digits.reverse
+  rounds.times do |round|
+    #rounds -= 1
+    player_guess = play_round(round).to_i.digits.reverse
     score = calculate_score(computer_code, player_guess)
     if score.instance_of?(String)
       print(show_score([4, 0]))
-      rounds = 12
+      #rounds = 0
       break
     else
       print(show_score(score))
