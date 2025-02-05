@@ -77,7 +77,7 @@ def calculate_score(code, guess)
   b_result = black_pins.map.with_index do |b_code, index|
     if black_pins[index] == white_pins[index]
       nil
-    elsif white_pins.include?(b_code) && black_pins[0..2].include?(b_code) == false
+    elsif white_pins.include?(b_code)
       2
     end
   end
