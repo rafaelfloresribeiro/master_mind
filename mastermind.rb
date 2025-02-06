@@ -107,7 +107,7 @@ def play_game(rounds = 12)
   rounds.times do |round|
     #rounds -= 1
     player_guess = play_round(round).to_i.digits.reverse
-    score = calculate_score(computer_code, player_guess)
+    score = new_calculate_score(computer_code, player_guess)
     if score.instance_of?(String)
       print(show_score([4, 0]))
       #rounds = 0
@@ -122,7 +122,21 @@ def display_code(code)
   code.each { |pin| print color_squares(pin) }
 end
 
+def new_calculate_score(code, guess)
+  w_result = guess.map.with_index { |pegs, index| pegs == code[index] ? index : nil }
+  b_guess = guess - w_result
+  b_code = code - w_result
+  b_result = b_code.map.with_index { |remaining_code, index| b_guess.include?(remaining_code) ? index : nil }
+  w_result.compact.length == 4 ? 'Game Over' : [w_result.compact.length, b_result.compact.length]
+  binding.pry
+end
+
+# new_calculate_score([2, 1, 5, 6], [2, 1, 6, 5])
 play_game
+
+
+
+
 
 # a funcao color_squares cospe seu quadrado colorido com numero. o computer code generator e so 4 digitos aleatorios
 # correspondente ao codigo. voce pode criar uma funcao que use os dois para fazer display das opcoes selecionadas (X)
