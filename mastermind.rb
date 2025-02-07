@@ -27,8 +27,8 @@ def color_squares(color)
 end
 
 def computer_code_generator
-  #Array.new(4) { rand(1..6) }
-  [1, 2, 1, 4]
+  Array.new(4) { rand(1..6) }
+  #[1, 2, 1, 4]
 end
 
 SEQUENCE = [1, 2, 3, 4, 5, 6]
@@ -123,12 +123,12 @@ def display_code(code)
 end
 
 def new_calculate_score(code, guess)
-  w_result = guess.map.with_index { |pegs, index| pegs == code[index] ? index : nil }
-  b_guess = guess - w_result
-  b_code = code - w_result
-  b_result = b_code.map.with_index { |remaining_code, index| b_guess.include?(remaining_code) ? index : nil }
-  w_result.compact.length == 4 ? 'Game Over' : [w_result.compact.length, b_result.compact.length]
-  binding.pry
+  white_pin_tally = guess.map.with_index { |pegs, index| pegs == code[index] ? index : nil }
+  b_result = guess.reject.with_index { |_, index| white_pin_tally.include?(index) }
+  w_result = code.reject.with_index { |_, index| white_pin_tally.include?(index) }
+  black_pin_tally = b_result.map { |b_pin| w_result.include?(b_pin) ? 5 : nil }
+  white_pin_tally.compact.length == 4 ? 'Game Over' : [white_pin_tally.compact.length, black_pin_tally.compact.length]
+  # binding.pry
 end
 
 # new_calculate_score([2, 1, 5, 6], [2, 1, 6, 5])
