@@ -39,11 +39,14 @@ def game_start
 end
 
 def game_intro
-  print "Welcome to Mastermind \n the computer will use one of 6 colors to represent it's code\n "
+  print "Welcome to Mastermind \n you or the computer will use one of 6 colors to represent its code\n "
   display_code(SEQUENCE)
   print "\nfor each correct guess in the correct position, you get a \e[37m ⬤\e[0m\n"
   print "for each correct guess in the incorrect position, you get a \e[30m ⬤\e[0m\n"
-  print "the computer will generate a 4 color code, and you have to guess within 12 turns\n"
+  print "you can choose to be the code master or the code breaker\n"
+  print "by being the code master, the computer will try to guess your code\n"
+  print "by being the code breaker, the computer will generate a 4 color code,\n"
+  print "and you have to guess within 12 turns\n"
 end
 
 def play_round(round_number)
@@ -51,7 +54,7 @@ def play_round(round_number)
   until guess
     print "Guess the colors\n"
     guess = gets.chomp
-    if valid_input?(guess) == true
+    if valid_guess?(guess) == true
       print("Round #{round_number + 1} played successfully\n")
     else
       print("Your answer should only contain numbers and only have 4 digits\n")
@@ -61,35 +64,41 @@ def play_round(round_number)
   guess
 end
 
-def valid_input?(input)
+def valid_guess?(input)
   test_input = Integer(input)
-  if test_input.class == Integer && test_input.to_s.length == 4
+  if test_input.instance_of(Integer) && test_input.to_s.length == 4
     true
   end
 rescue ArgumentError
   false
 end
 
-def calculate_score(code, guess)
-  white_pins = code
-  black_pins = guess
-  w_result = white_pins.map.with_index { |a_code, index| a_code == black_pins[index] ? 1 : nil }
-  b_result = black_pins.map.with_index do |b_code, index|
-    if black_pins[index] == white_pins[index]
-      nil
-    elsif white_pins.include?(b_code)
-      2
-    end
+def valid_input?(input)
+  test_input = Integer(input)
+  if test_input.class == Integer
+    true
   end
-  #binding.pry
-  if w_result.compact.length == 4
-    'End game'
-  else
-    [w_result.compact.length, b_result.compact.length]
-  end
-  #binding.pry
+rescue ArgumentError
+  false
 end
-# iterar por uma lista, desconsiderando o ultimo numero
+
+# def calculate_score(code, guess)
+#   white_pins = code
+#   black_pins = guess
+#   w_result = white_pins.map.with_index { |a_code, index| a_code == black_pins[index] ? 1 : nil }
+#   b_result = black_pins.map.with_index do |b_code, index|
+#     if black_pins[index] == white_pins[index]
+#       nil
+#     elsif white_pins.include?(b_code)
+#       2
+#     end
+#   end
+#   if w_result.compact.length == 4
+#     'End game'
+#   else
+#     [w_result.compact.length, b_result.compact.length]
+#   end
+# end
 
 def show_score(score)
   if score.instance_of?(Array)
@@ -102,15 +111,13 @@ def show_score(score)
 end
 
 def play_game(rounds = 12)
-  game_intro
+  # game_intro
   print computer_code = computer_code_generator
   rounds.times do |round|
-    #rounds -= 1
     player_guess = play_round(round).to_i.digits.reverse
     score = new_calculate_score(computer_code, player_guess)
     if score.instance_of?(String)
       print(show_score([4, 0]))
-      #rounds = 0
       break
     else
       print(show_score(score))
@@ -128,26 +135,53 @@ def new_calculate_score(code, guess)
   w_result = code.reject.with_index { |_, index| white_pin_tally.include?(index) }
   black_pin_tally = b_result.map { |b_pin| w_result.include?(b_pin) ? 5 : nil }
   white_pin_tally.compact.length == 4 ? 'Game Over' : [white_pin_tally.compact.length, black_pin_tally.compact.length]
-  # binding.pry
 end
 
-# new_calculate_score([2, 1, 5, 6], [2, 1, 6, 5])
-play_game
+def mode_selector(mode)
+  case mode
+  when 'breaker'
+    rounds = false
+    until rounds
+      print "Choose the amount of rounds \nDefault: 12\n"
+      rounds = gets.chomp
+      if valid_input?(rounds) == true
+        play_game(rounds.to_i)
+      else
+        print("Only numbers are valid\n")
+        rounds = false
+      end
+    end
+  when 'master'
+    game_intro
+    play_game
+  end
+end
 
+def player_code_master
+  print("Type the number/color sequence you'd like the computer to guess\n")
+  player_code = false
+  until player_code
+    player_code = gets.chomp
+    if valid_input?(player_code) == true && player_code.length == 4
+      print("Your guess is \n")
+      display_code(player_code.to_i.digits.reverse)
+      player_code.to_i.digits.reverse
+    else
+      print("Your answer must contain only four digits, from 1 to 6.\n")
+      player_code = false
+    end
+  end
+end
 
+def computer_playing(player_code)
+  print("The computer will now guess\n")
+  first_guess = computer_code_generator
+  print("the computer guesses\n")
+  display_code(first_guess)
+  new_calculate_score(player_code, first_guess)
+end
 
+# def computer_rng
 
-
-# a funcao color_squares cospe seu quadrado colorido com numero. o computer code generator e so 4 digitos aleatorios
-# correspondente ao codigo. voce pode criar uma funcao que use os dois para fazer display das opcoes selecionadas (X)
-
-# 5142
-# 1111
-
-# proximo passos
-# Arrumar quando se pula linha
-# Conferir se o jogo funciona corretamente
-# Mexa no gerador pra gerar sempre o mesmo numero e teste os uso-caso
-# Adicione as correlacoes de numeros com cores
-# Altere o inicio pra sair daquele quadrado preto esquisito que voce nao tava conseguindo mudar pras novas bolas
-# coloridas
+# mode_selector('master')
+computer_playing
