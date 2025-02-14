@@ -27,8 +27,8 @@ def color_squares(color)
 end
 
 def computer_code_generator
-  Array.new(4) { rand(1..6) }
-  #[1, 2, 1, 4]
+  # Array.new(4) { rand(1..6) }
+  [2, 2, 2, 2]
 end
 
 SEQUENCE = [1, 2, 3, 4, 5, 6]
@@ -66,7 +66,7 @@ end
 
 def valid_guess?(input)
   test_input = Integer(input)
-  if test_input.instance_of(Integer) && test_input.to_s.length == 4
+  if test_input.class(Integer) && test_input.to_s.length == 4
     true
   end
 rescue ArgumentError
@@ -81,24 +81,6 @@ def valid_input?(input)
 rescue ArgumentError
   false
 end
-
-# def calculate_score(code, guess)
-#   white_pins = code
-#   black_pins = guess
-#   w_result = white_pins.map.with_index { |a_code, index| a_code == black_pins[index] ? 1 : nil }
-#   b_result = black_pins.map.with_index do |b_code, index|
-#     if black_pins[index] == white_pins[index]
-#       nil
-#     elsif white_pins.include?(b_code)
-#       2
-#     end
-#   end
-#   if w_result.compact.length == 4
-#     'End game'
-#   else
-#     [w_result.compact.length, b_result.compact.length]
-#   end
-# end
 
 def show_score(score)
   if score.instance_of?(Array)
@@ -131,10 +113,13 @@ end
 
 def new_calculate_score(code, guess)
   white_pin_tally = guess.map.with_index { |pegs, index| pegs == code[index] ? index : nil }
-  b_result = guess.reject.with_index { |_, index| white_pin_tally.include?(index) }
-  w_result = code.reject.with_index { |_, index| white_pin_tally.include?(index) }
-  black_pin_tally = b_result.map { |b_pin| w_result.include?(b_pin) ? 5 : nil }
-  white_pin_tally.compact.length == 4 ? 'Game Over' : [white_pin_tally.compact.length, black_pin_tally.compact.length]
+  black_pin_tally = code.map.with_index { |pegs, index| guess.include?(pegs) ? index : nil }
+  # binding.pry
+  if white_pin_tally.compact.length == 4
+    'Game Over'
+  else
+    [white_pin_tally.compact.length, black_pin_tally.compact.length - white_pin_tally.compact.length]
+  end
 end
 
 def mode_selector(mode)
@@ -153,7 +138,8 @@ def mode_selector(mode)
     end
   when 'master'
     game_intro
-    play_game
+    player_code = player_code_master
+    computer_playing(player_code)
   end
 end
 
@@ -163,25 +149,41 @@ def player_code_master
   until player_code
     player_code = gets.chomp
     if valid_input?(player_code) == true && player_code.length == 4
-      print("Your guess is \n")
+      print("Your code is \n")
       display_code(player_code.to_i.digits.reverse)
-      player_code.to_i.digits.reverse
     else
       print("Your answer must contain only four digits, from 1 to 6.\n")
       player_code = false
     end
   end
+  player_code.to_i.digits.reverse
 end
 
 def computer_playing(player_code)
-  print("The computer will now guess\n")
-  first_guess = computer_code_generator
-  print("the computer guesses\n")
-  display_code(first_guess)
-  new_calculate_score(player_code, first_guess)
+  12.times do
+    print("The computer will now guess\n")
+    random_guess = computer_code_generator
+    sleep 1
+    print("the computer guesses\n")
+    display_code(random_guess)
+    sleep 1
+    print ("the computer scores \n")
+    computer_score = new_calculate_score(player_code, random_guess)
+    print("#{show_score(computer_score)} \n")
+    sleep 1
+    if computer_score == 'Game Over'
+      print('The computer won')
+      break
+    end
+  end
 end
 
+def computer_code_breaker(last_result, guess)
+
+end
 # def computer_rng
 
-# mode_selector('master')
-computer_playing
+mode_selector('master')
+
+# na sua versao de mastermind, os pinos funcionam errado. pinos certos em locais errados contam mesmo se forem
+# repetidos. no codigo (1111) com o chute (1222), a resposta seria (1, 3) pra pinos brancos e pretos
