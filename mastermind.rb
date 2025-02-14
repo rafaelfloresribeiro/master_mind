@@ -6,7 +6,7 @@
 #                    3) verificar quais dos numeros jogados equivalem aos numeros gerados                (X)
 #                    4) mostrar o resultado ao jogador                                                   (X)
 #                    5) repetir os passos 2-4 ate o 12 round ou o jogador acertar o codigo               (X)
-#                    6) polir o resultado, oferecer uma UI 
+#                    6) polir o resultado, oferecer uma UI                                               (X)
 
 require 'pry-byebug'
 def color_squares(color)
@@ -27,8 +27,11 @@ def color_squares(color)
 end
 
 def computer_code_generator
+  alpha = rand(1..6)
+  beta = rand(1..6)
   # Array.new(4) { rand(1..6) }
-  [2, 2, 2, 2]
+  [1, 1, 2, 2]
+  # [alpha, alpha, beta, beta]
 end
 
 SEQUENCE = [1, 2, 3, 4, 5, 6]
@@ -162,28 +165,36 @@ end
 def computer_playing(player_code)
   12.times do
     print("The computer will now guess\n")
-    random_guess = computer_code_generator
+    # random_guess = computer_code_generator
     sleep 1
     print("the computer guesses\n")
-    display_code(random_guess)
+    guess = first_guess_generator
+    display_code(guess)
     sleep 1
-    print ("the computer scores \n")
-    computer_score = new_calculate_score(player_code, random_guess)
+    print("the computer scores \n")
+    computer_score = new_calculate_score(player_code, guess)
     print("#{show_score(computer_score)} \n")
     sleep 1
     if computer_score == 'Game Over'
       print('The computer won')
       break
     end
+    next_guess = computer_code_breaker(guess, computer_score)
   end
 end
 
-def computer_code_breaker(last_result, guess)
-
+def computer_code_breaker(guess, last_result)
+  case last_result
+  when [0, 4]
+    [guess[1], guess[1], guess[0], guess[0] ]
+  end
 end
-# def computer_rng
+
+def first_guess_generator
+  first_digit = rand(1..6)
+  second_digit = rand(1..6)
+  [first_digit, first_digit, second_digit, second_digit]
+  [2, 2, 1, 1]
+end
 
 mode_selector('master')
-
-# na sua versao de mastermind, os pinos funcionam errado. pinos certos em locais errados contam mesmo se forem
-# repetidos. no codigo (1111) com o chute (1222), a resposta seria (1, 3) pra pinos brancos e pretos
