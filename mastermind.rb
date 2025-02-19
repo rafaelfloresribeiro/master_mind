@@ -27,10 +27,10 @@ def color_squares(color)
 end
 
 def computer_code_generator
-  alpha = rand(1..6)
-  beta = rand(1..6)
-  # Array.new(4) { rand(1..6) }
-  [1, 1, 2, 2]
+  # alpha = rand(1..6)
+  # beta = rand(1..6)
+  Array.new(4) { rand(1..6) }
+  # [1, 1, 2, 2]
   # [alpha, alpha, beta, beta]
 end
 
@@ -117,7 +117,6 @@ end
 def new_calculate_score(code, guess)
   white_pin_tally = guess.map.with_index { |pegs, index| pegs == code[index] ? index : nil }
   black_pin_tally = code.map.with_index { |pegs, index| guess.include?(pegs) ? index : nil }
-  # binding.pry
   if white_pin_tally.compact.length == 4
     'Game Over'
   else
@@ -163,38 +162,57 @@ def player_code_master
 end
 
 def computer_playing(player_code)
-  12.times do
-    print("The computer will now guess\n")
-    # random_guess = computer_code_generator
-    sleep 1
-    print("the computer guesses\n")
-    guess = first_guess_generator
-    display_code(guess)
-    sleep 1
-    print("the computer scores \n")
-    computer_score = new_calculate_score(player_code, guess)
-    print("#{show_score(computer_score)} \n")
-    sleep 1
-    if computer_score == 'Game Over'
-      print('The computer won')
-      break
-    end
-    next_guess = computer_code_breaker(guess, computer_score)
+  first_guess = first_guess_generator
+  computer_play_round_text(first_guess, player_code)
+  computer_score = new_calculate_score(first_guess, player_code)
+  until computer_score == 'Game Over'
+    next_guess = computer_code_breaker(first_guess, computer_score)
+    computer_play_round_text(next_guess, computer_score)
+    computer_score = new_calculate_score(next_guess, player_code)
   end
-end
+end # o computador e imbativel agora. se os turnos forem infinitos. hora de refinar mais. ideias
+# 1. guardar os numeros que deram resultados negativos e nao usa-los novamente no proximo chute
+# 2. seu objetivo nao e uma super solucao, e sim garantir que o computador va vencer em menos de uns 20 turnos
 
 def computer_code_breaker(guess, last_result)
+  $ran_numbers = []
   case last_result
   when [0, 4]
-    [guess[1], guess[1], guess[0], guess[0] ]
+    [guess[2], guess[2], guess[0], guess[0]]
+  when [0, 0]
+    first_guess_generator
+  when [2, 4]
+    [guess[2], guess[2], guess[0], guess[0]]
+  else
+    guess = first_guess_generator
+    #until guess.include?($ran_numbers)
+    #  guess = first_guess_generator
+    #end
+  end
+  if last_result == [0, 0]
+    last_result.digits.reverse.each { |result| result << $ran_numbers }
   end
 end
 
 def first_guess_generator
   first_digit = rand(1..6)
   second_digit = rand(1..6)
-  [first_digit, first_digit, second_digit, second_digit]
-  [2, 2, 1, 1]
+  second_digit = rand(1..6) until second_digit != first_digit
+  pepa = [first_digit, first_digit, second_digit, second_digit]
+end
+
+def computer_play_round_text(guess, code)
+  print("The computer will now guess\n")
+  sleep 1
+  print("the computer guesses\n")
+  # binding.pry
+  display_code(guess)
+  sleep 1
+  print("the computer scores \n")
+  computer_score = new_calculate_score(code, guess)
+  print("#{show_score(computer_score)} \n")
+  sleep 1
+  computer_score == 'Game Over' ? print('The computer won') : nil
 end
 
 mode_selector('master')
