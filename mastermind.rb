@@ -1,13 +1,5 @@
 # frozen_string_literal = true
 
-# a explicacao aparece na tela, agora falta todo o resto
-# o programa precisa: 1) gerar um codigo de 4 numeros usando uma das 6 cores                             (X)
-#                    2) fornecer uma forma do jogador jogar                                              (X)
-#                    3) verificar quais dos numeros jogados equivalem aos numeros gerados                (X)
-#                    4) mostrar o resultado ao jogador                                                   (X)
-#                    5) repetir os passos 2-4 ate o 12 round ou o jogador acertar o codigo               (X)
-#                    6) polir o resultado, oferecer uma UI                                               (X)
-
 require 'pry-byebug'
 def color_squares(color)
   case color
@@ -15,8 +7,8 @@ def color_squares(color)
     "\e[41m  1  \e[0m"
   when 2
     "\e[42m  2  \e[0m"
-  when 3                            #mais tarde voce provavelmente consegue diminuir o tamanho desses cases com algum
-    "\e[43m  3  \e[0m"              #tipo de map
+  when 3
+    "\e[43m  3  \e[0m"
   when 4
     "\e[44m  4  \e[0m"
   when 5
@@ -114,14 +106,10 @@ def display_code(code)
   code.each { |pin| print color_squares(pin) }
 end
 
-def new_calculate_score(code, guess)
+def new_calculate_score(guess, code)
   white_pin_tally = guess.map.with_index { |pegs, index| pegs == code[index] ? index : nil }
-  black_pin_tally = code.map.with_index { |pegs, index| guess.include?(pegs) ? index : nil }
-  if white_pin_tally.compact.length == 4
-    'Game Over'
-  else
-    [white_pin_tally.compact.length, black_pin_tally.compact.length - white_pin_tally.compact.length]
-  end
+  black_pin_tally = guess.map.with_index { |pegs, index| code.include?(pegs) ? index : nil }
+  [white_pin_tally.compact.length, black_pin_tally.compact.length - white_pin_tally.compact.length]
 end
 
 def mode_selector(mode)
@@ -165,47 +153,49 @@ def computer_playing(player_code)
   first_guess = first_guess_generator
   computer_play_round_text(first_guess, player_code)
   computer_score = new_calculate_score(first_guess, player_code)
-  until computer_score == 'Game Over'
-    next_guess = computer_code_breaker(first_guess, computer_score)
-    computer_play_round_text(next_guess, computer_score)
+  possible_guess = all_codes
+  next_guess, possible_guess = chinese_computer_code_breaker(first_guess, computer_score, possible_guess)
+  computer_play_round_text(next_guess, player_code)
+  computer_score = new_calculate_score(next_guess, player_code)
+  round_counter = 0
+  until computer_score == [4, 0]
+    round_counter += 1
+    print("Round number #{round_counter} \n")
+    next_guess, possible_guess = chinese_computer_code_breaker(next_guess, computer_score, possible_guess)
+    computer_play_round_text(next_guess, player_code)
     computer_score = new_calculate_score(next_guess, player_code)
   end
-end # o computador e imbativel agora. se os turnos forem infinitos. hora de refinar mais. ideias
-# 1. guardar os numeros que deram resultados negativos e nao usa-los novamente no proximo chute
-# 2. seu objetivo nao e uma super solucao, e sim garantir que o computador va vencer em menos de uns 20 turnos
+  print('Game Over')
+end
 
-def computer_code_breaker(guess, last_result)
-  $ran_numbers = []
-  case last_result
-  when [0, 4]
-    [guess[2], guess[2], guess[0], guess[0]]
-  when [0, 0]
-    first_guess_generator
-  when [2, 4]
-    [guess[2], guess[2], guess[0], guess[0]]
-  else
-    guess = first_guess_generator
-    #until guess.include?($ran_numbers)
-    #  guess = first_guess_generator
-    #end
+def chinese_computer_code_breaker(last_computer_guess, feedback, possible_codes)
+  possible_codes.select! do |code|
+    new_calculate_score(last_computer_guess, code) == feedback
   end
-  if last_result == [0, 0]
-    last_result.digits.reverse.each { |result| result << $ran_numbers }
-  end
+  [possible_codes.sample, possible_codes]
+end
+
+def all_codes
+  (1..6).to_a.repeated_permutation(4).to_a
 end
 
 def first_guess_generator
   first_digit = rand(1..6)
   second_digit = rand(1..6)
   second_digit = rand(1..6) until second_digit != first_digit
-  pepa = [first_digit, first_digit, second_digit, second_digit]
+  [first_digit, first_digit, second_digit, second_digit]
+end
+
+def guessinator(exclude)
+  possible_numbers = (1..6).to_a - exclude.flatten
+  guess = possible_numbers.sample(2)
+  [guess[0], guess[0], guess[1], guess[1]]
 end
 
 def computer_play_round_text(guess, code)
   print("The computer will now guess\n")
   sleep 1
   print("the computer guesses\n")
-  # binding.pry
   display_code(guess)
   sleep 1
   print("the computer scores \n")
@@ -213,6 +203,10 @@ def computer_play_round_text(guess, code)
   print("#{show_score(computer_score)} \n")
   sleep 1
   computer_score == 'Game Over' ? print('The computer won') : nil
+end
+
+def guess_tracker(number_sequence)
+  response = number_sequence.uniq
 end
 
 mode_selector('master')
